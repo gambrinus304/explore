@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import csv
-
+import re
 
 
 
@@ -15,7 +15,7 @@ def get_html(url):
 def write_csv(data):
     with open('cmc_pagination.csv', 'a') as f:
         writer = csv.writer(f)
-        writer.writerow([data['name'], data['link'], data['price']])
+        writer.writerow((data['name'], data['link'], data['price']))
         
 
 
@@ -45,11 +45,21 @@ def get_page_data(html):
 
 
 def main():
-    pattern = 'https://coinmarketcap.com/{}'
+    url = 'https://coinmarketcap.com/'
 
-    for i in range(1, 6):
-        url = pattern.format(str(i))
+    while True:
         get_page_data(get_html(url))
+
+        soup = BeautifulSoup(get_html(url), 'lxml')
+        
+        try:
+            pattern = 'Next'
+            url = 'https://coinmarketcap.com/' + soup.find('ul', class_='pagination').find('a', text=re.compile(pattern)).get('href')
+        except:
+            break
+
+
+
 
 
 if __name__ == "__main__":
