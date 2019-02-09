@@ -5,7 +5,6 @@ from peewee import *
 
 db = PostgresqlDatabase(database='test', user='postgres', password='1', host='localhost')
 
-
 class Coin(Model):
     name = CharField()
     url = TextField()
@@ -15,10 +14,12 @@ class Coin(Model):
         database = db
 
 
-def refined(r):
-    row = r.split('Dict')[-1]
-    return row
+# ---test---
+# def refined(r):
+#     row = r.split('Dict')[-1]
+#     return row
     
+
 
 def main():
 
@@ -48,11 +49,11 @@ def main():
         #     for row in coins:
         #         Coin.create(**row) # **row == **kwargs
 
+
         # ---run with slise and index---
         with db.atomic():
             for index in range(0, len(coins), 100):
                 Coin.insert_many(coins[index:index+100]).execute()
-
 
 
 if __name__ == "__main__":
