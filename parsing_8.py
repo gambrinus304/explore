@@ -3,13 +3,9 @@ import csv
 
 
 
-
-
-
 def get_html(url):
     r = requests.get(url)
     return r.text
-        
         
         
 def write_csv(data):
@@ -17,7 +13,6 @@ def write_csv(data):
         order = ['name', 'url', 'description', 'traffic', 'percent']
         writer = csv.DictWriter(f, fieldnames=order)
         writer.writerow(data)
-
 
 
 def main():
@@ -43,8 +38,6 @@ def main():
                     'percent': percent}
 
             write_csv(data)
-
-
 
 
 
