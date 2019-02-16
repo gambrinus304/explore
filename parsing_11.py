@@ -65,13 +65,21 @@ def get_next(response):
         # print(html)
         write_html(html)
 
-    except:
-        print('Server posted the json-type response')
+    except Exception as e:
+        print(1, repr(e))
+        # print('Server posted the json-type response')
         
-    soup = BeautifulSoup(html, 'lxml')
+    content = response.json()
+    print(content.keys())
+    soup = BeautifulSoup(content['load_more_widget_html'], 'lxml')
     try:
-        url = 'https://youtube.com' + soup.find('button', class_='yt-uix-load-more').get('data-uix-load-more-href')
-    except:
+        button_load_more = soup.find('button', class_='yt-uix-load-more')
+        if button_load_more:
+            url = 'https://youtube.com' + button_load_more.get('data-uix-load-more-href')
+        else:
+            raise ValueError('No button load more')
+    except Exception as e:
+        print(2, repr(e))
         url = ''
 
 
