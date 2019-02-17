@@ -19,6 +19,7 @@ def write_csv(data):
         writer = csv.DictWriter(f, fieldnames=order)
         writer.writerow(data)
 
+
 # ---!!!---
 def write_html(data):
     with open ('youtube.html', 'w') as file:
@@ -38,69 +39,42 @@ def get_page_data(response):
         html = response.json()['content_html']
 
     soup = BeautifulSoup(html, 'lxml')
-    
     items = soup.find_all('h3', class_='yt-lockup-title')
 
     for item in items:
         name = item.text
         url = 'https://youtube.com' + item.find('a').get('href')
-        # print (name)
-        # print (url)
-        
         data = {'name': name, 'url': url}
         write_csv(data)
 
 
 def get_next(response):
-
-    # if 'html' in response.headers['Content-Type']:
-    #     html = response.text
-    # else:
-    #     # html = response.json()['1']
-    #     print('Server posted the json-type response')
-
-    try:
+    if 'html' in response.headers['Content-Type']:
         html = response.text
-        print('we get next html')
-        # print(html)
-        write_html(html)
-
-    except Exception as e:
-        print(1, repr(e))
-        # print('Server posted the json-type response')
-        
-    content = response.json()
-    print(content.keys())
-    soup = BeautifulSoup(content['load_more_widget_html'], 'lxml')
+        # header = response.headers['Content-Type']
+        # print("Response header: " + header)
+    else:
+        html = response.json()['load_more_widget_html']
+        # header = response.headers['Content-Type']
+        # print("Response header: " + header)
+    
     try:
-        button_load_more = soup.find('button', class_='yt-uix-load-more')
-        if button_load_more:
-            url = 'https://youtube.com' + button_load_more.get('data-uix-load-more-href')
-        else:
-            raise ValueError('No button load more')
-    except Exception as e:
-        print(2, repr(e))
+        soup = BeautifulSoup(html, 'lxml')
+        url = 'https://youtube.com' + soup.find('button', class_='yt-uix-load-more').get('data-uix-load-more-href')
+    except:
         url = ''
 
-
-    print(url)
     return url
 
 
-
 def main():
-    # url = 'https://www.youtube.com/channel/UCBDLWj5X5D9bvBa3JIMMTIQ/videos'    
+    url = 'https://www.youtube.com/channel/UCBDLWj5X5D9bvBa3JIMMTIQ/videos'    
     # url = 'https://www.youtube.com/browse_ajax?ctoken=4qmFsgJAEhhVQ0JETFdqNVg1RDlidkJhM0pJTU1USVEaJEVnWjJhV1JsYjNNZ0FEZ0JZQUZxQUhvQk03Z0JBQSUzRCUzRA%253D%253D&continuation=4qmFsgJAEhhVQ0JETFdqNVg1RDlidkJhM0pJTU1USVEaJEVnWjJhV1JsYjNNZ0FEZ0JZQUZxQUhvQk03Z0JBQSUzRCUzRA%253D%253D&itct=CBwQybcCIhMI7_eTv4634AIVlbSbCh1j0Q'
-    url = 'https://www.youtube.com/browse_ajax?ctoken=4qmFsgJAEhhVQ0JETFdqNVg1RDlidkJhM0pJTU1USVEaJEVnWjJhV1JsYjNNZ0FEZ0JZQUZxQUhvQk03Z0JBQSUzRCUzRA%253D%253D'
-           
-    # get_page_data(get_html(url))
-
+         
     while True:
         response = get_html(url)
         get_page_data(response)
-
         url = get_next(response)
-        # get_next(response)
 
         if url:
             continue
@@ -109,13 +83,6 @@ def main():
             break
 
     # write_html(get_html(url))
-
-
-
-
-
-
-
 
 
 
